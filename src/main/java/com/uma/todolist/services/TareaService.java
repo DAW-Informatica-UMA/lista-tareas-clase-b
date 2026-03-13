@@ -30,4 +30,40 @@ public class TareaService {
                                     t.isCompletada()))
                 .toList();
     }
+
+    public List<TareaDTO> obtener(String titulo) {
+        return listaDeTareas.stream()
+                .filter(t ->
+                        t.getTitulo().toLowerCase().contains(titulo.toLowerCase()))
+                .map(t -> new TareaDTO(t.getId(), t.getTitulo(),
+                                            t.isCompletada()))
+                .toList();
+    }
+
+    public TareaDTO obtener(Long id) {
+        return listaDeTareas.stream()
+                .filter(t -> t.getId().equals(id))
+                .map(t -> new TareaDTO(t.getId(),
+                                            t.getTitulo(),
+                                            t.isCompletada()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public void eliminar(Long id) {
+        listaDeTareas.removeIf(t -> t.getId().equals(id));
+    }
+
+    public TareaDTO completar(Long id) {
+        return listaDeTareas.stream()
+                .filter(t->t.getId().equals(id))
+                .findFirst()
+                .map(t -> {
+                    t.setCompletada(true);
+                    return new TareaDTO(t.getId(),
+                                        t.getTitulo(),
+                                        t.isCompletada());
+                })
+                .orElse(null);
+    }
 }
