@@ -6,21 +6,27 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TareaService {
     private List<Tarea> listaDeTareas = new ArrayList<>();
     private Long idCounter = 1L;
 
-    public TareaDTO crear (String titulo) {
-        Tarea nueva = new Tarea(idCounter++, titulo,
-                                false,
-                                "ALTA");
+    public Optional<TareaDTO> crear (String titulo) {
+        if (titulo == null || titulo.isBlank()) {
+            return Optional.empty();
+        }
+
+        Tarea nueva = new Tarea(idCounter++, titulo, false, "ALTA");
         listaDeTareas.add(nueva);
 
-        return new TareaDTO(nueva.getId(),
-                            nueva.getTitulo(),
-                            nueva.isCompletada());
+        // Devolvemos el DTO envuelto en un Optional
+        return Optional.of(new TareaDTO(
+                nueva.getId(),
+                nueva.getTitulo(),
+                nueva.isCompletada()
+        ));
     }
 
     public List<TareaDTO> obtenerTodas() {
@@ -40,30 +46,26 @@ public class TareaService {
                 .toList();
     }
 
-    public TareaDTO obtener(Long id) {
+    public Optional<TareaDTO> obtener(Long id) {
         return listaDeTareas.stream()
                 .filter(t -> t.getId().equals(id))
                 .map(t -> new TareaDTO(t.getId(),
                                             t.getTitulo(),
                                             t.isCompletada()))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     public void eliminar(Long id) {
         listaDeTareas.removeIf(t -> t.getId().equals(id));
     }
 
-    public TareaDTO completar(Long id) {
+    public Optional<TareaDTO> completar(Long id) {
         return listaDeTareas.stream()
-                .filter(t->t.getId().equals(id))
-                .findFirst()
-                .map(t -> {
+                .filter(t -> t.getId().equals(id))
+                .findFirst() // Devuelve Optional<Tarea>
+                .map(t -> {  // Si existe la tarea, entra aquí:
                     t.setCompletada(true);
-                    return new TareaDTO(t.getId(),
-                                        t.getTitulo(),
-                                        t.isCompletada());
-                })
-                .orElse(null);
+                    return new TareaDTO(t.getId(), t.getTitulo(), t.isCompletada());
+                }); // Si no existe, el Optional se mantiene vacío automáticamente
     }
 }
