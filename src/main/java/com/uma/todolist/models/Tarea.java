@@ -19,6 +19,9 @@ public class Tarea {
     @JoinColumn(name="categoria_id")
     private Categoria categoria;
 
+    @ManyToMany
+    List<Persona> personas = new ArrayList();
+
     public Tarea (Long id, String titulo,
                   boolean completada,
                   String prioridad) {
