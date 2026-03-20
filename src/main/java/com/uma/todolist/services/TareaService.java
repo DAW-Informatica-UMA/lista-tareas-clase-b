@@ -1,7 +1,10 @@
 package com.uma.todolist.services;
 
+import com.uma.todolist.dtos.DtoAndEntityMapper;
 import com.uma.todolist.dtos.TareaDTO;
 import com.uma.todolist.models.Tarea;
+import com.uma.todolist.repositories.TareaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -10,62 +13,49 @@ import java.util.Optional;
 
 @Service
 public class TareaService {
-    private List<Tarea> listaDeTareas = new ArrayList<>();
-    private Long idCounter = 1L;
+    @Autowired
+    private TareaRepository repositorio;
 
     public Optional<TareaDTO> crear (String titulo) {
         if (titulo == null || titulo.isBlank()) {
             return Optional.empty();
         }
 
-        Tarea nueva = new Tarea(idCounter++, titulo, false, "ALTA");
-        listaDeTareas.add(nueva);
+        Tarea nueva = new Tarea();
+        nueva.setTitulo(titulo);
+        nueva.setCompletada(false);
+        nueva.setPrioridad("ALTA");
 
         // Devolvemos el DTO envuelto en un Optional
-        return Optional.of(new TareaDTO(
-                nueva.getId(),
-                nueva.getTitulo(),
-                nueva.isCompletada()
-        ));
+        return Optional.of(DtoAndEntityMapper.toDto(repositorio.save(nueva)));
     }
 
     public List<TareaDTO> obtenerTodas() {
-        return listaDeTareas.stream()
-                .map(t -> new TareaDTO(t.getId(),
-                                    t.getTitulo(),
-                                    t.isCompletada()))
-                .toList();
+        return repositorio.findAll().stream()
+                                    .map(DtoAndEntityMapper::toDto)
+                                    .toList();
     }
 
     public List<TareaDTO> obtener(String titulo) {
-        return listaDeTareas.stream()
-                .filter(t ->
-                        t.getTitulo().toLowerCase().contains(titulo.toLowerCase()))
-                .map(t -> new TareaDTO(t.getId(), t.getTitulo(),
-                                            t.isCompletada()))
-                .toList();
+        return repositorio.findByTituloContainingIgnoreCase(titulo)
+                          .stream()
+                          .map(DtoAndEntityMapper::toDto)
+                          .toList();
     }
 
     public Optional<TareaDTO> obtener(Long id) {
-        return listaDeTareas.stream()
-                .filter(t -> t.getId().equals(id))
-                .map(t -> new TareaDTO(t.getId(),
-                                            t.getTitulo(),
-                                            t.isCompletada()))
-                .findFirst();
+        return repositorio.findById(id).map(DtoAndEntityMapper::toDto);
     }
 
     public void eliminar(Long id) {
-        listaDeTareas.removeIf(t -> t.getId().equals(id));
+        repositorio.deleteById(id);
     }
 
     public Optional<TareaDTO> completar(Long id) {
-        return listaDeTareas.stream()
-                .filter(t -> t.getId().equals(id))
-                .findFirst() // Devuelve Optional<Tarea>
-                .map(t -> {  // Si existe la tarea, entra aquí:
-                    t.setCompletada(true);
-                    return new TareaDTO(t.getId(), t.getTitulo(), t.isCompletada());
-                }); // Si no existe, el Optional se mantiene vacío automáticamente
+        return repositorio.findById(id)
+                .map(tarea -> {
+                    tarea.setCompletada(true);
+                    return DtoAndEntityMapper.toDto(repositorio.save(tarea));
+                });
     }
 }

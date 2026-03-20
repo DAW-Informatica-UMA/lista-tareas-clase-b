@@ -1,10 +1,23 @@
 package com.uma.todolist.models;
 
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name="tareas")
 public class Tarea {
+    @Id @GeneratedValue
     private Long id;
     private String titulo;
+    @Column(name="finalizada")
     private boolean completada;
     private String prioridad;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="categoria_id")
+    private Categoria categoria;
 
     public Tarea (Long id, String titulo,
                   boolean completada,
@@ -13,6 +26,10 @@ public class Tarea {
         this.setTitulo(titulo);
         this.setCompletada(completada);
         this.setPrioridad(prioridad);
+    }
+
+    public Tarea() {
+
     }
 
     public Long getId() {
