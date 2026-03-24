@@ -33,3 +33,5 @@ Podemos consultar la lista completa de tareas con:
 curl --location 'http://localhost:8080/api/tareas' \
 --header 'Accept: application/json'
 ```
+
+También se puede importar a Postman el fichero `todolist.postman_collection.json` incluido en el repositorio. Este fichero contiene una colección de peticiones HTTP a los diferentes endpoints de la aplicación.
