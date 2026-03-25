@@ -5,6 +5,8 @@ public class TareaDTO {
     private String titulo;
     private boolean completada;
 
+    public TareaDTO(){}
+
     public TareaDTO (Long id, String titulo,
                   boolean completada) {
         this.setId(id);
