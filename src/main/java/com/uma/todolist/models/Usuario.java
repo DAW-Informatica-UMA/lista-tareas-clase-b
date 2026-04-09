@@ -23,6 +23,11 @@ public class Usuario {
     @Column(name = "rol")
     private Set<String> roles; // Ej: ["ROLE_USER", "ROLE_ADMIN"]
 
+    // Relación 1:1 con Persona
+    @OneToOne
+    @JoinColumn(name = "persona_id")
+    private Persona persona;
+
     public Long getId() {
         return id;
     }
