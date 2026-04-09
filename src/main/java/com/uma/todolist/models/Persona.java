@@ -18,5 +18,8 @@ public class Persona {
     @ManyToMany(mappedBy = "personas")
     List<Tarea> tareas = new ArrayList();
 
+    @OneToOne(mappedBy = "persona")
+    private Usuario usuario;
+
     public Persona(){}
 }
