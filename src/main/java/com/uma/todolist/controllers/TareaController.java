@@ -7,10 +7,12 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +20,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/tareas")
 @Tag(name = "Tareas", description = "Operaciones para la gestión de tareas y sus colaboradores")
+// Esto hace que aparezca el candado en todos los métodos de esta clase en Swagger
+@SecurityRequirement(name = "bearer-key")
+// CAPA 1: Solo usuarios autenticados con rol USER o superior pueden entrar al controlador
+@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 public class TareaController {
     @Autowired
     private TareaService tareaService;
@@ -32,7 +38,7 @@ public class TareaController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @GetMapping
-    public ResponseEntity<List<TareaDTO>> listaTareas(){
+    public ResponseEntity<List<TareaDTO>> listaTareas() {
         List<TareaDTO> tareas = tareaService.obtenerTodas();
         // Usamos .ok() para devolver un 200 OK.
         // En listados, aunque esté vacía, la petición ha tenido éxito.
@@ -54,10 +60,10 @@ public class TareaController {
             @ApiResponse(responseCode = "500", description = "Error interno al procesar la búsqueda", content = @Content)
     })
     @GetMapping("/buscar")
-    public ResponseEntity<List<TareaDTO>> buscar (@RequestParam(
-            name="titulo",
-            required=false,
-            defaultValue = "") String titulo){
+    public ResponseEntity<List<TareaDTO>> buscar(@RequestParam(
+            name = "titulo",
+            required = false,
+            defaultValue = "") String titulo) {
         // 200 OK: El cliente pidió filtrar y le devolvemos el resultado (sea cual sea).
         return ResponseEntity.ok(tareaService.obtener(titulo));
     }
@@ -113,10 +119,22 @@ public class TareaController {
                     responseCode = "500",
                     description = "Error interno al intentar guardar la tarea",
                     content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "No autenticado (falta token o es inválido)",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Prohibido (no tienes el rol necesario)",
+                    content = @Content
             )
     })
     @PostMapping
-    public ResponseEntity<TareaDTO> añadir (@RequestBody TareaDTO tarea) {
+    // CAPA 2: Solo los ADMIN pueden crear tareas
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<TareaDTO> añadir(@RequestBody TareaDTO tarea) {
         return tareaService.crear(tarea.getTitulo())
                 .map(t -> ResponseEntity.status(HttpStatus.CREATED).body(t)) // 201 Created: Estándar REST para creación.
                 .orElse(ResponseEntity.badRequest().build()); // 400 Bad Request: Si el título era null o vacío.
@@ -142,9 +160,21 @@ public class TareaController {
                     responseCode = "500",
                     description = "Error interno al intentar eliminar la tarea",
                     content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "No autenticado (falta token o es inválido)",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Prohibido (no tienes el rol necesario)",
+                    content = @Content
             )
     })
     @DeleteMapping("/{id}")
+    // CAPA 2: Solo los ADMIN pueden crear tareas
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> borrar(@PathVariable Long id) {
         tareaService.eliminar(id);
         // 204 No Content: La acción se realizó con éxito pero no hay nada que devolver en el cuerpo.
@@ -171,9 +201,21 @@ public class TareaController {
                     responseCode = "500",
                     description = "Error interno al procesar la actualización",
                     content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "No autenticado (falta token o es inválido)",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Prohibido (no tienes el rol necesario)",
+                    content = @Content
             )
     })
     @PutMapping("/{id}")
+    // CAPA 2: Solo los ADMIN pueden crear tareas
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TareaDTO> completar(@PathVariable Long id) {
         // Si el servicio logra completar la tarea (existe), devuelve 200 OK con los datos actualizados.
         // Si el ID no existe, devuelve 404 Not Found.
