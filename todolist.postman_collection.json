@@ -28,6 +28,36 @@
       "response": []
     },
     {
+      "name": "Obtener tareas JWT",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJqZWZlIiwicm9sZXMiOlsiUk9MRV9BRE1JTiIsIkZBQ1RPUl9QQVNTV09SRCJdLCJleHAiOjE3NzU4MzA2MjUsImlhdCI6MTc3NTc0NDIyNX0.DhMnAGNU7O2qUPnMxx7hehtdzaKXavkHJSgMvrkD2LYNDmQ8vc_CXpQAZCmX6_eHWdX3LJ5JNzWNB1Oi-Ye91Q",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/tareas",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "tareas"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
       "name": "Obtener tarea por su id",
       "request": {
         "method": "GET",
@@ -153,6 +183,96 @@
             "api",
             "tareas",
             "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Registrar usuario admin",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"jefe\", \"password\": \"123\", \"roles\": [\"ROLE_ADMIN\"]}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/auth/register",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Registrar usuario",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"ruben\", \"password\": \"456\", \"roles\": [\"ROLE_USER\"]}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/auth/register",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login de usuario",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"jefe\", \"password\": \"123\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/auth/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "auth",
+            "login"
           ]
         }
       },
