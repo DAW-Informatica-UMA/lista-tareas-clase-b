@@ -23,7 +23,6 @@ import java.util.List;
 // Esto hace que aparezca el candado en todos los métodos de esta clase en Swagger
 @SecurityRequirement(name = "bearer-key")
 // CAPA 1: Solo usuarios autenticados con rol USER o superior pueden entrar al controlador
-@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 public class TareaController {
     @Autowired
     private TareaService tareaService;

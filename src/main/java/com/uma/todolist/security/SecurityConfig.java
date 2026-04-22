@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // Login abierto
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll() // Swagger abierto
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/**").permitAll()
                         .anyRequest().authenticated() // Todo lo demás bloqueado
                 );
 
